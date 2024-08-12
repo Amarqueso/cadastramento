@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastros</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container">
+        <h2 class="mt-5">Lista de Cadastros</h2>
+        <table class="table table-striped mt-3">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nome</th>
+                    <th>Telefone</th>
+                    <th>E-mail</th>
+                    <th>Data/Hora</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for cadastro in cadastros %}
+                <tr>
+                    <td>{{ cadastro.id }}</td>
+                    <td>{{ cadastro.nome }}</td>
+                    <td>{{ cadastro.telefone }}</td>
+                    <td>{{ cadastro.email }}</td>
+                    <td>{{ cadastro.data_hora }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>
