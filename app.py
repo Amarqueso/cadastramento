@@ -11,6 +11,7 @@ db = SQLAlchemy(app)
 
 # Modelo de dados com novos campos
 class Cadastro(db.Model):
+    __tablename__ = 'cadastro'  # Explicitamente define o nome da tabela
     id = db.Column(db.Integer, primary_key=True)
     nome = db.Column(db.String(100), nullable=False)
     telefone = db.Column(db.String(20), nullable=False)
@@ -25,12 +26,10 @@ class Cadastro(db.Model):
     def __repr__(self):
         return f'<Cadastro {self.nome}>'
 
-# Rota principal para exibir o formulário de cadastro
 @app.route('/')
 def index():
     return render_template('index.html')
 
-# Rota para processar o cadastro
 @app.route('/cadastrar', methods=['POST'])
 def cadastrar():
     try:
@@ -60,19 +59,15 @@ def cadastrar():
     except Exception as e:
         return f'Erro ao cadastrar: {e}'
 
-# Rota para exibir os cadastros com busca por nome e data no formato brasileiro
 @app.route('/cadastros', methods=['GET', 'POST'])
 def cadastros():
     try:
         if request.method == 'POST':
             nome_busca = request.form.get('nome_busca', '')
-            # Busca os cadastros que correspondem ao nome
             todos_cadastros = Cadastro.query.filter(Cadastro.nome.ilike(f'%{nome_busca}%')).order_by(Cadastro.data_hora.desc()).all()
         else:
-            # Caso não haja busca, retorna todos os cadastros
             todos_cadastros = Cadastro.query.order_by(Cadastro.data_hora.desc()).all()
         
-        # Formatar a data no padrão brasileiro
         for cadastro in todos_cadastros:
             cadastro.data_hora = cadastro.data_hora.strftime('%d/%m/%Y %H:%M:%S')
             
@@ -81,7 +76,7 @@ def cadastros():
         return f'Erro ao exibir cadastros: {e}'
 
 if __name__ == '__main__':
-    # Cria o banco de dados se ainda não existir
     with app.app_context():
-        db.create_all()
+        db.create_all()  # Cria as tabelas no banco de dados
+        print("Banco de dados e tabelas criados com sucesso.")  # Mensagem de depuração
     app.run(debug=True)
