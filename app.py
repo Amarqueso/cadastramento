@@ -33,47 +33,52 @@ def index():
 # Rota para processar o cadastro
 @app.route('/cadastrar', methods=['POST'])
 def cadastrar():
-    nome = request.form['nome']
-    telefone = request.form['telefone']
-    email = request.form['email']
-    pretensao = request.form['pretensao']
-    tipo_imovel = request.form['tipo_imovel']
-    quartos = int(request.form['quartos'])
-    vagas = int(request.form['vagas'])
-    suites = int(request.form['suites'])
+    try:
+        nome = request.form['nome']
+        telefone = request.form['telefone']
+        email = request.form['email']
+        pretensao = request.form['pretensao']
+        tipo_imovel = request.form['tipo_imovel']
+        quartos = int(request.form['quartos'])
+        vagas = int(request.form['vagas'])
+        suites = int(request.form['suites'])
 
-    # Cria um novo cadastro e salva no banco de dados
-    novo_cadastro = Cadastro(
-        nome=nome,
-        telefone=telefone,
-        email=email,
-        pretensao=pretensao,
-        tipo_imovel=tipo_imovel,
-        quartos=quartos,
-        vagas=vagas,
-        suites=suites
-    )
-    db.session.add(novo_cadastro)
-    db.session.commit()
-
-    return redirect('/')
+        # Cria um novo cadastro e salva no banco de dados
+        novo_cadastro = Cadastro(
+            nome=nome,
+            telefone=telefone,
+            email=email,
+            pretensao=pretensao,
+            tipo_imovel=tipo_imovel,
+            quartos=quartos,
+            vagas=vagas,
+            suites=suites
+        )
+        db.session.add(novo_cadastro)
+        db.session.commit()
+        return redirect('/cadastros')
+    except Exception as e:
+        return f'Erro ao cadastrar: {e}'
 
 # Rota para exibir os cadastros com busca por nome e data no formato brasileiro
 @app.route('/cadastros', methods=['GET', 'POST'])
 def cadastros():
-    if request.method == 'POST':
-        nome_busca = request.form.get('nome_busca', '')
-        # Busca os cadastros que correspondem ao nome
-        todos_cadastros = Cadastro.query.filter(Cadastro.nome.ilike(f'%{nome_busca}%')).order_by(Cadastro.data_hora.desc()).all()
-    else:
-        # Caso não haja busca, retorna todos os cadastros
-        todos_cadastros = Cadastro.query.order_by(Cadastro.data_hora.desc()).all()
-    
-    # Formatar a data no padrão brasileiro
-    for cadastro in todos_cadastros:
-        cadastro.data_hora = cadastro.data_hora.strftime('%d/%m/%Y %H:%M:%S')
+    try:
+        if request.method == 'POST':
+            nome_busca = request.form.get('nome_busca', '')
+            # Busca os cadastros que correspondem ao nome
+            todos_cadastros = Cadastro.query.filter(Cadastro.nome.ilike(f'%{nome_busca}%')).order_by(Cadastro.data_hora.desc()).all()
+        else:
+            # Caso não haja busca, retorna todos os cadastros
+            todos_cadastros = Cadastro.query.order_by(Cadastro.data_hora.desc()).all()
         
-    return render_template('cadastros.html', cadastros=todos_cadastros)
+        # Formatar a data no padrão brasileiro
+        for cadastro in todos_cadastros:
+            cadastro.data_hora = cadastro.data_hora.strftime('%d/%m/%Y %H:%M:%S')
+            
+        return render_template('cadastros.html', cadastros=todos_cadastros)
+    except Exception as e:
+        return f'Erro ao exibir cadastros: {e}'
 
 if __name__ == '__main__':
     # Cria o banco de dados se ainda não existir
