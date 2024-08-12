@@ -1,62 +1,45 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 
 app = Flask(__name__)
 
 # Configuração do banco de dados SQLite
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///cadastro.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///cadastros.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
-# Definição do modelo para armazenar os cadastros
+# Modelo de dados
 class Cadastro(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     nome = db.Column(db.String(100), nullable=False)
-    telefone = db.Column(db.String(15), nullable=False)
+    telefone = db.Column(db.String(20), nullable=False)
     email = db.Column(db.String(100), nullable=False)
-    data_hora = db.Column(db.DateTime, default=datetime.utcnow)
+    data_hora = db.Column(db.DateTime, default=datetime.now)
 
     def __repr__(self):
         return f'<Cadastro {self.nome}>'
 
-# Rota para a página inicial e processamento do formulário
-@app.route('/', methods=['GET', 'POST'])
+# Rota principal para exibir o formulário de cadastro
+@app.route('/')
 def index():
-    if request.method == 'POST':
-        nome = request.form['nome']
-        telefone = request.form['telefone']
-        email = request.form['email']
-        
-        # Cria um novo registro de cadastro
-        novo_cadastro = Cadastro(nome=nome, telefone=telefone, email=email)
-
-        try:
-            db.session.add(novo_cadastro)
-            db.session.commit()
-            return redirect(url_for('index'))
-        except:
-            return 'Houve um problema ao salvar seu cadastro.'
-
     return render_template('index.html')
 
-@app.route('/cadastros')
-def cadastros():
-    # Busca todos os cadastros no banco de dados
-    todos_cadastros = Cadastro.query.order_by(Cadastro.data_hora.desc()).all()
-    return render_template('cadastros.html', cadastros=todos_cadastros)
+# Rota para processar o cadastro
+@app.route('/cadastrar', methods=['POST'])
+def cadastrar():
+    nome = request.form['nome']
+    telefone = request.form['telefone']
+    email = request.form['email']
 
-@app.route('/cadastros')
-def cadastros():
-    # Busca todos os cadastros no banco de dados, ordenados por data/hora
-    todos_cadastros = Cadastro.query.order_by(Cadastro.data_hora.desc()).all()
-    
-    # Formatar a data no padrão brasileiro
-    for cadastro in todos_cadastros:
-        cadastro.data_hora = cadastro.data_hora.strftime('%d/%m/%Y %H:%M:%S')
-        
-    return render_template('cadastros.html', cadastros=todos_cadastros)
+    # Cria um novo cadastro e salva no banco de dados
+    novo_cadastro = Cadastro(nome=nome, telefone=telefone, email=email)
+    db.session.add(novo_cadastro)
+    db.session.commit()
 
+    return redirect('/')
+
+# Rota para exibir os cadastros com busca por nome e data no formato brasileiro
 @app.route('/cadastros', methods=['GET', 'POST'])
 def cadastros():
     if request.method == 'POST':
@@ -73,12 +56,7 @@ def cadastros():
         
     return render_template('cadastros.html', cadastros=todos_cadastros)
 
-
-
-
-# Inicializa o banco de dados
-with app.app_context():
+if __name__ == '__main__':
+    # Cria o banco de dados se ainda não existir
     db.create_all()
-
-if __name__ == "__main__":
     app.run(debug=True)
