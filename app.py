@@ -1,11 +1,12 @@
 from flask import Flask, render_template, request, redirect
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
+import os
 
 app = Flask(__name__)
 
-# Configuração do banco de dados SQLite
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///cadastros.db'
+# Configuração do banco de dados SQLite para a pasta 'instance'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(app.instance_path, 'cadastros.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
@@ -76,6 +77,10 @@ def cadastros():
         return f'Erro ao exibir cadastros: {e}'
 
 if __name__ == '__main__':
+    # Cria a pasta instance se não existir
+    if not os.path.exists(app.instance_path):
+        os.makedirs(app.instance_path)
+    
     with app.app_context():
         db.create_all()  # Cria as tabelas no banco de dados
         print("Banco de dados e tabelas criados com sucesso.")  # Mensagem de depuração
