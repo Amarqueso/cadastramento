@@ -9,7 +9,14 @@
 <body>
     <div class="container">
         <h2 class="mt-5">Lista de Cadastros</h2>
-        <table class="table table-striped mt-3">
+
+        <!-- Formulário de busca -->
+        <form method="POST" action="/cadastros" class="form-inline mb-4">
+            <input type="text" name="nome_busca" class="form-control mr-sm-2" placeholder="Buscar por nome">
+            <button type="submit" class="btn btn-primary">Buscar</button>
+        </form>
+
+        <table class="table table-striped">
             <thead>
                 <tr>
                     <th>ID</th>

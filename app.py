@@ -46,6 +46,32 @@ def cadastros():
     todos_cadastros = Cadastro.query.order_by(Cadastro.data_hora.desc()).all()
     return render_template('cadastros.html', cadastros=todos_cadastros)
 
+@app.route('/cadastros')
+def cadastros():
+    # Busca todos os cadastros no banco de dados, ordenados por data/hora
+    todos_cadastros = Cadastro.query.order_by(Cadastro.data_hora.desc()).all()
+    
+    # Formatar a data no padrão brasileiro
+    for cadastro in todos_cadastros:
+        cadastro.data_hora = cadastro.data_hora.strftime('%d/%m/%Y %H:%M:%S')
+        
+    return render_template('cadastros.html', cadastros=todos_cadastros)
+
+@app.route('/cadastros', methods=['GET', 'POST'])
+def cadastros():
+    if request.method == 'POST':
+        nome_busca = request.form['nome_busca']
+        # Busca os cadastros que correspondem ao nome
+        todos_cadastros = Cadastro.query.filter(Cadastro.nome.ilike(f'%{nome_busca}%')).order_by(Cadastro.data_hora.desc()).all()
+    else:
+        # Caso não haja busca, retorna todos os cadastros
+        todos_cadastros = Cadastro.query.order_by(Cadastro.data_hora.desc()).all()
+    
+    # Formatar a data no padrão brasileiro
+    for cadastro in todos_cadastros:
+        cadastro.data_hora = cadastro.data_hora.strftime('%d/%m/%Y %H:%M:%S')
+        
+    return render_template('cadastros.html', cadastros=todos_cadastros)
 
 
 
