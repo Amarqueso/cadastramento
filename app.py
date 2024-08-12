@@ -81,7 +81,13 @@ if __name__ == '__main__':
     if not os.path.exists(app.instance_path):
         os.makedirs(app.instance_path)
     
+    # Imprime o caminho do banco de dados para verificação
+    print("Caminho do banco de dados:", os.path.join(app.instance_path, 'cadastros.db'))
+
     with app.app_context():
-        db.create_all()  # Cria as tabelas no banco de dados
-        print("Banco de dados e tabelas criados com sucesso.")  # Mensagem de depuração
+        try:
+            db.create_all()  # Cria as tabelas no banco de dados
+            print("Banco de dados e tabelas criados com sucesso.")  # Mensagem de depuração
+        except Exception as e:
+            print(f'Erro ao criar o banco de dados e tabelas: {e}')
     app.run(debug=True)
