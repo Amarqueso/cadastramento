@@ -43,7 +43,7 @@ def cadastrar():
 @app.route('/cadastros', methods=['GET', 'POST'])
 def cadastros():
     if request.method == 'POST':
-        nome_busca = request.form['nome_busca']
+        nome_busca = request.form.get('nome_busca', '')
         # Busca os cadastros que correspondem ao nome
         todos_cadastros = Cadastro.query.filter(Cadastro.nome.ilike(f'%{nome_busca}%')).order_by(Cadastro.data_hora.desc()).all()
     else:
