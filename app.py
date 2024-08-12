@@ -77,5 +77,6 @@ def cadastros():
 
 if __name__ == '__main__':
     # Cria o banco de dados se ainda não existir
-    db.create_all()
+    with app.app_context():
+        db.create_all()
     app.run(debug=True)
