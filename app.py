@@ -26,10 +26,7 @@ class Cadastro(db.Model):
     suites = db.Column(db.Integer, nullable=False)
     data_hora = db.Column(db.DateTime, default=datetime.now)
 
-# Função para criar o banco de dados
-@app.before_first_request
-def create_tables():
-    db.create_all()
+
 
 @app.route('/')
 def index():
