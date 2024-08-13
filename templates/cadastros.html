@@ -1,53 +1,26 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lista de Cadastros</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <title>Cadastros</title>
 </head>
 <body>
-    <div class="container">
-        <h2 class="mt-5">Lista de Cadastros</h2>
+    <h2>Lista de Cadastros</h2>
+    
+    <form action="/cadastros" method="POST">
+        <label for="nome_busca">Buscar por Nome:</label>
+        <input type="text" id="nome_busca" name="nome_busca">
+        <button type="submit">Buscar</button>
+    </form>
 
-        <!-- Formulário de busca -->
-        <form method="POST" action="/cadastros" class="form-inline mb-4">
-            <input type="text" name="nome_busca" class="form-control mr-sm-2" placeholder="Buscar por nome">
-            <button type="submit" class="btn btn-primary">Buscar</button>
-        </form>
+    <ul>
+        {% for cadastro in cadastros %}
+            <li>{{ cadastro.nome }} - {{ cadastro.telefone }} - {{ cadastro.email }} - {{ cadastro.pretensao }} - {{ cadastro.tipo_imovel }} - {{ cadastro.quartos }} quartos - {{ cadastro.vagas }} vagas - {{ cadastro.suites }} suítes - {{ cadastro.data_hora }}</li>
+        {% endfor %}
+    </ul>
 
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Nome</th>
-                    <th>Telefone</th>
-                    <th>E-mail</th>
-                    <th>Pretensão</th>
-                    <th>Tipo de Imóvel</th>
-                    <th>Quartos</th>
-                    <th>Vagas</th>
-                    <th>Suítes</th>
-                    <th>Data/Hora</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for cadastro in cadastros %}
-                <tr>
-                    <td>{{ cadastro.id }}</td>
-                    <td>{{ cadastro.nome }}</td>
-                    <td>{{ cadastro.telefone }}</td>
-                    <td>{{ cadastro.email }}</td>
-                    <td>{{ cadastro.pretensao }}</td>
-                    <td>{{ cadastro.tipo_imovel }}</td>
-                    <td>{{ cadastro.quartos }}</td>
-                    <td>{{ cadastro.vagas }}</td>
-                    <td>{{ cadastro.suites }}</td>
-                    <td>{{ cadastro.data_hora }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
+    <a href="/logout"><button>Sair</button></a>
+    <a href="/download"><button>Baixar Cadastros em Excel</button></a>
 </body>
 </html>
