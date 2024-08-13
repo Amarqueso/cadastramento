@@ -2,38 +2,51 @@ from flask import Flask, render_template, request, redirect, url_for, session, s
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 import os
-import pandas as pd
+import openpyxl
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'
 
-# Caminho para o banco de dados SQLite
+# Configuração do banco de dados
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///instance/cadastro.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
+# Inicializa o banco de dados
 db = SQLAlchemy(app)
 
-# Definição do modelo de dados
+# Modelo do banco de dados
 class Cadastro(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    nome = db.Column(db.String(100), nullable=False)
-    telefone = db.Column(db.String(50), nullable=False)
-    email = db.Column(db.String(100), nullable=False)
-    pretensao = db.Column(db.String(20), nullable=False)
-    tipo_imovel = db.Column(db.String(20), nullable=False)
-    quartos = db.Column(db.Integer, nullable=False)
-    vagas = db.Column(db.Integer, nullable=False)
-    suites = db.Column(db.Integer, nullable=False)
+    nome = db.Column(db.String(100))
+    telefone = db.Column(db.String(20))
+    email = db.Column(db.String(100))
+    pretensao = db.Column(db.String(20))
+    tipo_imovel = db.Column(db.String(50))
+    quartos = db.Column(db.Integer)
+    vagas = db.Column(db.Integer)
+    suites = db.Column(db.Integer)
     data_hora = db.Column(db.DateTime, default=datetime.now)
 
+# Página de login
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        if request.form['username'] == 'admin' and request.form['password'] == '12345678':
+            session['logged_in'] = True
+            return redirect(url_for('cadastros'))
+        else:
+            return render_template('login.html', error='Invalid credentials')
+    return render_template('login.html')
 
+# Página de logout
+@app.route('/logout')
+def logout():
+    session.pop('logged_in', None)
+    return redirect(url_for('login'))
 
-@app.route('/')
+# Página de cadastramento
+@app.route('/', methods=['GET', 'POST'])
 def index():
-    return render_template('index.html')
-
-@app.route('/cadastrar', methods=['GET', 'POST'])
-def cadastrar():
     if request.method == 'POST':
         nome = request.form['nome']
         telefone = request.form['telefone']
@@ -43,85 +56,45 @@ def cadastrar():
         quartos = request.form['quartos']
         vagas = request.form['vagas']
         suites = request.form['suites']
-        data_hora = datetime.now()
+        novo_cadastro = Cadastro(nome=nome, telefone=telefone, email=email, pretensao=pretensao, tipo_imovel=tipo_imovel, quartos=quartos, vagas=vagas, suites=suites)
+        db.session.add(novo_cadastro)
+        db.session.commit()
+        return redirect(url_for('index'))
+    return render_template('index.html')
 
-        novo_cadastro = Cadastro(nome=nome, telefone=telefone, email=email, pretensao=pretensao,
-                                 tipo_imovel=tipo_imovel, quartos=quartos, vagas=vagas, suites=suites,
-                                 data_hora=data_hora)
-
-        try:
-            db.session.add(novo_cadastro)
-            db.session.commit()
-            return redirect(url_for('cadastrar'))
-        except Exception as e:
-            print(f"Erro ao cadastrar: {e}")
-            return "Erro ao cadastrar."
-
-    return render_template('cadastrar.html')
-
-@app.route('/cadastros', methods=['GET', 'POST'])
+# Página de visualização de cadastros
+@app.route('/cadastros')
 def cadastros():
-    if 'loggedin' not in session:
+    if not session.get('logged_in'):
         return redirect(url_for('login'))
-
-    if request.method == 'POST':
-        nome_busca = request.form['nome_busca']
-        cadastros = Cadastro.query.filter(Cadastro.nome.like(f'%{nome_busca}%')).order_by(Cadastro.data_hora.desc()).all()
-    else:
-        cadastros = Cadastro.query.order_by(Cadastro.data_hora.desc()).all()
-
+    cadastros = Cadastro.query.order_by(Cadastro.data_hora.desc()).all()
     return render_template('cadastros.html', cadastros=cadastros)
 
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-    if request.method == 'POST':
-        username = request.form['username']
-        password = request.form['password']
-
-        if username == 'admin' and password == '12345678':
-            session['loggedin'] = True
-            return redirect(url_for('cadastros'))
-        else:
-            return "Usuário ou senha incorretos!"
-
-    return render_template('login.html')
-
-@app.route('/logout')
-def logout():
-    session.pop('loggedin', None)
-    return redirect(url_for('login'))
-
-@app.route('/download')
-def download():
-    if 'loggedin' not in session:
+# Função para baixar cadastros como Excel
+@app.route('/download_excel')
+def download_excel():
+    if not session.get('logged_in'):
         return redirect(url_for('login'))
 
+    # Criar um novo arquivo Excel
+    workbook = openpyxl.Workbook()
+    sheet = workbook.active
+    sheet.title = 'Cadastros'
+
+    # Cabeçalhos
+    sheet.append(['Nome', 'Telefone', 'Email', 'Pretensão', 'Tipo de Imóvel', 'Quartos', 'Vagas', 'Suítes', 'Data e Hora'])
+
+    # Dados
     cadastros = Cadastro.query.all()
+    for cadastro in cadastros:
+        sheet.append([cadastro.nome, cadastro.telefone, cadastro.email, cadastro.pretensao, cadastro.tipo_imovel, cadastro.quartos, cadastro.vagas, cadastro.suites, cadastro.data_hora])
 
-    if not cadastros:
-        return "Nenhum cadastro disponível para download."
-
-    data = {
-        'Nome': [cadastro.nome for cadastro in cadastros],
-        'Telefone': [cadastro.telefone for cadastro in cadastros],
-        'Email': [cadastro.email for cadastro in cadastros],
-        'Pretensão': [cadastro.pretensao for cadastro in cadastros],
-        'Tipo de Imóvel': [cadastro.tipo_imovel for cadastro in cadastros],
-        'Quartos': [cadastro.quartos for cadastro in cadastros],
-        'Vagas': [cadastro.vagas for cadastro in cadastros],
-        'Suítes': [cadastro.suites for cadastro in cadastros],
-        'Data e Hora': [cadastro.data_hora.strftime('%d/%m/%Y %H:%M:%S') for cadastro in cadastros]
-    }
-
-    df = pd.DataFrame(data)
+    # Salvar o arquivo temporariamente
     file_path = 'cadastros.xlsx'
-    df.to_excel(file_path, index=False)
+    workbook.save(file_path)
 
+    # Enviar o arquivo para o usuário
     return send_file(file_path, as_attachment=True)
 
 if __name__ == '__main__':
-    # Garante que a pasta "instance" exista
-    if not os.path.exists(os.path.join(app.root_path, 'instance')):
-        os.makedirs(os.path.join(app.root_path, 'instance'))
-
     app.run(debug=True)
