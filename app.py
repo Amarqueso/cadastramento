@@ -27,26 +27,8 @@ class Cadastro(db.Model):
     suites = db.Column(db.Integer, nullable=False)
     data_hora = db.Column(db.DateTime, default=datetime.now, nullable=False)
 
-@app.route('/')
-def index():
-    return render_template('index.html')
-
-
-# Página de login
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-    if request.method == 'POST':
-        username = request.form['username']
-        password = request.form['password']
-        if username == 'admin' and password == '12345678':
-            session['logged_in'] = True
-            return redirect(url_for('cadastros'))
-        else:
-            flash('Credenciais inválidas. Tente novamente.')
-    return render_template('login.html')
-
-# Página de cadastramento
-@app.route('/cadastrar', methods=['GET', 'POST'])
+# Página Inicial (Cadastro)
+@app.route('/', methods=['GET', 'POST'])
 def cadastrar():
     if request.method == 'POST':
         nome = request.form['nome']
@@ -78,7 +60,20 @@ def cadastrar():
 
     return render_template('cadastrar.html')
 
-# Página de cadastros
+# Página de Login
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        if username == 'admin' and password == '12345678':
+            session['logged_in'] = True
+            return redirect(url_for('cadastros'))
+        else:
+            flash('Credenciais inválidas. Tente novamente.')
+    return render_template('login.html')
+
+# Página de Cadastros
 @app.route('/cadastros')
 def cadastros():
     if not session.get('logged_in'):
