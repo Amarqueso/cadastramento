@@ -27,12 +27,6 @@ class Cadastro(db.Model):
     suites = db.Column(db.Integer, nullable=False)
     data_hora = db.Column(db.DateTime, default=datetime.now, nullable=False)
 
-# Função para criar o banco de dados, se ainda não existir
-@app.before_first_request
-def create_tables():
-    if not os.path.exists(os.path.join(base_dir, 'instance/cadastros.db')):
-        db.create_all()
-
 # Página de login
 @app.route('/login', methods=['GET', 'POST'])
 def login():
