@@ -30,13 +30,14 @@ class Cadastro(db.Model):
 # Página de login
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    error = None
     if request.method == 'POST':
         if request.form['username'] == 'admin' and request.form['password'] == '12345678':
             session['logged_in'] = True
             return redirect(url_for('cadastros'))
         else:
-            return render_template('login.html', error='Invalid credentials')
-    return render_template('login.html')
+            error = 'Usuário ou senha inválidos'
+    return render_template('login.html', error=error)
 
 # Página de logout
 @app.route('/logout')
