@@ -29,7 +29,7 @@ class Cadastro(db.Model):
 
 # Página Inicial (Cadastro)
 @app.route('/', methods=['GET', 'POST'])
-def cadastrar():
+def index():
     if request.method == 'POST':
         nome = request.form['nome']
         telefone = request.form['telefone']
@@ -56,9 +56,9 @@ def cadastrar():
         db.session.commit()
 
         flash('Cadastro realizado com sucesso!')
-        return redirect(url_for('cadastrar'))
+        return redirect(url_for('index'))
 
-    return render_template('cadastrar.html')
+    return render_template('index.html')
 
 # Página de Login
 @app.route('/login', methods=['GET', 'POST'])
