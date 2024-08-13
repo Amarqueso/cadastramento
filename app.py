@@ -27,6 +27,11 @@ class Cadastro(db.Model):
     suites = db.Column(db.Integer, nullable=False)
     data_hora = db.Column(db.DateTime, default=datetime.now, nullable=False)
 
+@app.route('/')
+def index():
+    return render_template('index.html')
+
+
 # Página de login
 @app.route('/login', methods=['GET', 'POST'])
 def login():

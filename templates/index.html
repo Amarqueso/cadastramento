@@ -1,56 +1,25 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cadastro de Imóveis</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <title>Início - Sistema de Cadastramento</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 </head>
 <body>
     <div class="container">
-        <h2 class="mt-5">Cadastro de Imóveis</h2>
-        <form action="/cadastrar" method="POST">
-            <div class="form-group">
-                <label for="nome">Nome:</label>
-                <input type="text" class="form-control" id="nome" name="nome" required>
-            </div>
-            <div class="form-group">
-                <label for="telefone">Telefone:</label>
-                <input type="text" class="form-control" id="telefone" name="telefone" required>
-            </div>
-            <div class="form-group">
-                <label for="email">E-mail:</label>
-                <input type="email" class="form-control" id="email" name="email" required>
-            </div>
-            <div class="form-group">
-                <label for="pretensao">Pretensão:</label>
-                <select class="form-control" id="pretensao" name="pretensao" required>
-                    <option value="alugar">Alugar</option>
-                    <option value="vender">Vender</option>
-                    <option value="comprar">Comprar</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="tipo_imovel">Tipo de Imóvel:</label>
-                <select class="form-control" id="tipo_imovel" name="tipo_imovel" required>
-                    <option value="casa">Casa</option>
-                    <option value="apartamento">Apartamento</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="quartos">Número de Quartos:</label>
-                <input type="number" class="form-control" id="quartos" name="quartos" required>
-            </div>
-            <div class="form-group">
-                <label for="vagas">Número de Vagas:</label>
-                <input type="number" class="form-control" id="vagas" name="vagas" required>
-            </div>
-            <div class="form-group">
-                <label for="suites">Número de Suítes:</label>
-                <input type="number" class="form-control" id="suites" name="suites" required>
-            </div>
-            <button type="submit" class="btn btn-primary">Cadastrar</button>
-        </form>
+        <h1 class="mt-5">Bem-vindo ao Sistema de Cadastramento</h1>
+        <p class="lead">Este é um sistema para cadastrar informações e visualizar cadastros.</p>
+        
+        <div class="mt-4">
+            <a href="{{ url_for('cadastrar') }}" class="btn btn-primary">Cadastrar</a>
+            <a href="{{ url_for('login') }}" class="btn btn-secondary">Login</a>
+            <a href="{{ url_for('cadastros') }}" class="btn btn-info">Ver Cadastros</a>
+        </div>
     </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>
